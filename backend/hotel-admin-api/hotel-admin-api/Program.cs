@@ -63,6 +63,23 @@ var database = app.Services.GetRequiredService<SQLiteConnection>();
 database.CreateTable<Hotel>();
 database.CreateTable<User>();
 
+if (!database.Table<Hotel>().Any())
+{
+    database.InsertAll(new[]
+    {
+        new Hotel { Name = "Hotel Sol", Address = "Calle Mayor 1, Madrid", Reviews = new List<int> { 5, 4, 5 } },
+        new Hotel { Name = "Hotel Mediterráneo", Address = "Avenida del Mar 12, Barcelona", Reviews = new List<int> { 4, 5, 4 } },
+        new Hotel { Name = "Hotel Alameda", Address = "Paseo de la Alameda 8, Valencia", Reviews = new List<int> { 4, 4, 3 } },
+        new Hotel { Name = "Hotel Giralda", Address = "Calle Sierpes 20, Sevilla", Reviews = new List<int> { 5, 5, 4 } },
+        new Hotel { Name = "Hotel Atlántico", Address = "Rúa Real 15, A Coruña", Reviews = new List<int> { 3, 4, 4 } },
+        new Hotel { Name = "Hotel Sierra", Address = "Gran Vía 33, Bilbao", Reviews = new List<int> { 4, 3, 4 } },
+        new Hotel { Name = "Hotel Jardines", Address = "Calle de los Jardines 6, Málaga", Reviews = new List<int> { 5, 4, 5 } },
+        new Hotel { Name = "Hotel Catedral", Address = "Plaza de la Catedral 2, Santiago de Compostela", Reviews = new List<int> { 4, 5, 5 } },
+        new Hotel { Name = "Hotel Naranjos", Address = "Calle Colón 18, Córdoba", Reviews = new List<int> { 3, 4, 3 } },
+        new Hotel { Name = "Hotel Castillo", Address = "Paseo del Castillo 10, Toledo", Reviews = new List<int> { 5, 4, 4 } }
+    });
+}
+
 var seededAdmin = database.Table<User>().FirstOrDefault(user => user.Username == adminUsername);
 if (seededAdmin is null)
 {
