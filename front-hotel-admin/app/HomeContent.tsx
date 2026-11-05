@@ -16,21 +16,6 @@ export default function HomeContent({ footerYear }: { footerYear: ReactNode }) {
 
   return (
     <main>
-      <section className="hero">
-        <div className="hero-content">
-          <p className="eyebrow">UNA ESTANCIA PARA RECORDAR</p>
-          <h1>Tu próximo destino<br />empieza aquí.</h1>
-          <p className="hero-copy">
-            Lugares únicos, hospitalidad cercana y momentos que se quedan contigo.
-            Encuentra el hotel ideal para tu próxima escapada.
-          </p>
-          <a className="button button-light" href="#hoteles">Explorar hoteles <span aria-hidden="true">↓</span></a>
-        </div>
-        <div className="hero-note">
-          <span className="hero-note-line" />
-          <span>Descubre tu lugar en el mundo</span>
-        </div>
-      </section>
 
       <section className="hotel-section" id="hoteles">
         <div className="section-heading">
