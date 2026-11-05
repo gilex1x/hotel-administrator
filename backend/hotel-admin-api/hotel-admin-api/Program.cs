@@ -38,6 +38,14 @@ var signingKey = JwtConfiguration.GetSigningKey(builder.Configuration);
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddSingleton(_ => new SQLiteConnection(databasePath));
+var frontendOrigin = builder.Configuration["Frontend:Origin"] ?? "http://localhost:3000";
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+        policy.WithOrigins(frontendOrigin)
+            .AllowAnyHeader()
+            .AllowAnyMethod());
+});
 builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -103,8 +111,9 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
+app.UseCors();
 
+app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
