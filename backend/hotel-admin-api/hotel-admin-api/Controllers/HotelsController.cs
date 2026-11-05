@@ -17,9 +17,31 @@ namespace hotel_admin_api.Controllers
         }
 
         [HttpGet(Name = "GetHotels")]
-        public ActionResult<List<Hotel>> Get()
+        public ActionResult<List<Hotel>> Get(
+            [FromQuery] string? name,
+            [FromQuery] double? rating)
         {
-            return Ok(_database.Table<Hotel>().ToList());
+            if (rating.HasValue && !double.IsFinite(rating.Value))
+            {
+                return BadRequest("The rating filter must be a finite number.");
+            }
+
+            var hotels = _database.Table<Hotel>().ToList();
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                hotels = hotels
+                    .Where(hotel => hotel.Name.Contains(name, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
+
+            if (rating.HasValue)
+            {
+                hotels = hotels
+                    .Where(hotel => hotel.AverageReviewScore >= rating.Value)
+                    .ToList();
+            }
+
+            return Ok(hotels);
         }
 
         [HttpGet("{id}", Name = "GetHotelById")]

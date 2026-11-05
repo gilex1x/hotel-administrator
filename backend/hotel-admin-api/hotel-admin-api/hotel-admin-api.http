@@ -4,6 +4,18 @@ GET {{URLAddress}}/api/hotels/
 Accept: application/json
 
 ###
+GET {{URLAddress}}/api/hotels?name=hotel
+Accept: application/json
+
+###
+GET {{URLAddress}}/api/hotels?rating=4
+Accept: application/json
+
+###
+GET {{URLAddress}}/api/hotels?name=hotel&rating=4
+Accept: application/json
+
+###
 GET {{URLAddress}}/api/hotels/2
 Accept: application/json
 
