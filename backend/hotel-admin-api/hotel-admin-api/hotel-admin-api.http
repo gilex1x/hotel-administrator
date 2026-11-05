@@ -1,11 +1,19 @@
-@hotel_admin_api_HostAddress = http://localhost:5002
+@URLAddress = http://localhost:5002
 
-GET {{hotel_admin_api_HostAddress}}/weatherforecast/
+GET {{URLAddress}}/api/hotels/
+Accept: application/json
+
+###
+GET {{URLAddress}}/api/hotels/2
 Accept: application/json
 
 ###
 
-GET {{hotel_admin_api_HostAddress}}/hotels/
+POST {{URLAddress}}/api/hotels/
 Accept: application/json
-
-###
+Content-Type:application/json
+{
+  "id":10,
+  "name":"Wilwood Hotel",
+  "address":"Av siempreviva"
+}

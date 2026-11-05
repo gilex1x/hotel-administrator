@@ -29,5 +29,23 @@ namespace hotel_admin_api.Controllers
             if (hotel == null) return NotFound();
             return Ok(hotel);
         }
+
+        [HttpPost(Name = "CreateHotel")]
+        public ActionResult<Hotel> Create(Hotel hotel)
+        {
+            if(hotel == null) return BadRequest();
+            hotels.Add(hotel);
+            return CreatedAtAction(nameof(GetById), new { id = hotel.Id }, hotel);
+        }
+
+        [HttpPut("{id}", Name = "UpdateHotel")]
+        public ActionResult<Hotel> Update(int id, Hotel updatedHotel)
+        {
+            var hotel = hotels.FirstOrDefault(hotel => hotel.Id == id);
+            if (hotel == null) return NotFound();
+            hotel.Name = updatedHotel.Name;
+            hotel.Address = updatedHotel.Address;
+            return Ok(hotel);
+        }
     }
 }
