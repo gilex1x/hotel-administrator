@@ -1,6 +1,8 @@
 using System.Security.Claims;
 using hotel_admin_api.Models;
+using hotel_admin_api.Repositories;
 using hotel_admin_api.Security;
+using hotel_admin_api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using SQLite;
@@ -38,6 +40,11 @@ var signingKey = JwtConfiguration.GetSigningKey(builder.Configuration);
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddSingleton(_ => new SQLiteConnection(databasePath));
+builder.Services.AddSingleton<IHotelRepository, SqliteHotelRepository>();
+builder.Services.AddSingleton<IUserRepository, SqliteUserRepository>();
+builder.Services.AddSingleton<IHotelService, HotelService>();
+builder.Services.AddSingleton<IAuthService, AuthService>();
+builder.Services.AddSingleton(signingKey);
 var frontendOrigin = builder.Configuration["Frontend:Origin"] ?? "http://localhost:3000";
 builder.Services.AddCors(options =>
 {

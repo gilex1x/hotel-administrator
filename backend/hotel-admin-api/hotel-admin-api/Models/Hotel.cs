@@ -9,8 +9,8 @@ namespace hotel_admin_api.Models
     {
         [PrimaryKey, AutoIncrement]
         public int Id { get; set; }
-        public string Name { get; set; }
-        public string Address { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Address { get; set; } = string.Empty;
 
         [Ignore]
         public List<int> Reviews { get; set; } = new List<int>();
