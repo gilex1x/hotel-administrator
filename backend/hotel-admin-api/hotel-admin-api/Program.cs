@@ -1,3 +1,4 @@
+using hotel_admin_api.Models;
 using SQLite;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,7 +24,7 @@ builder.Services.AddSingleton(_ => new SQLiteConnection(databasePath));
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
-app.Services.GetRequiredService<SQLiteConnection>();
+app.Services.GetRequiredService<SQLiteConnection>().CreateTable<Hotel>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

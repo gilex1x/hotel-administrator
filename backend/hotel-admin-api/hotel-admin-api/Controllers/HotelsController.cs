@@ -1,6 +1,6 @@
 ﻿using hotel_admin_api.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SQLite;
 
 namespace hotel_admin_api.Controllers
 {
@@ -8,25 +8,23 @@ namespace hotel_admin_api.Controllers
     [ApiController]
     public class HotelsController : ControllerBase
     {
-        //Change this to a database connection in the future
-        static private List<Hotel> hotels = new List<Hotel>
+        private readonly SQLiteConnection _database;
+
+        public HotelsController(SQLiteConnection database)
         {
-            new Hotel { Id = 1, Name = "Hotel A", Address = "123 Main St" },
-            new Hotel { Id = 2, Name = "Hotel B", Address = "456 Elm St" },
-            new Hotel { Id = 3, Name = "Hotel C", Address = "789 Oak St" },
-            new Hotel { Id = 4, Name = "Hotel D", Address = "101 Pine St" },
-        };
+            _database = database;
+        }
 
         [HttpGet(Name = "GetHotels")]
         public ActionResult<List<Hotel>> Get()
         {
-            return Ok(hotels);
+            return Ok(_database.Table<Hotel>().ToList());
         }
 
         [HttpGet("{id}", Name = "GetHotelById")]
         public ActionResult<Hotel> GetById(int id)
         {
-            var hotel = hotels.FirstOrDefault(hotel => hotel.Id == id);
+            var hotel = _database.Find<Hotel>(id);
             if (hotel == null) return NotFound();
             return Ok(hotel);
         }
@@ -34,28 +32,26 @@ namespace hotel_admin_api.Controllers
         [HttpPost(Name = "CreateHotel")]
         public ActionResult<Hotel> Create(Hotel hotel)
         {
-            if(hotel == null) return BadRequest();
-            hotels.Add(hotel);
+            if (hotel == null) return BadRequest();
+
+            hotel.Id = 0;
+            _database.Insert(hotel);
             return CreatedAtAction(nameof(GetById), new { id = hotel.Id }, hotel);
         }
 
         [HttpPut("{id}", Name = "UpdateHotel")]
         public IActionResult Update(int id, Hotel updatedHotel)
         {
-            var hotel = hotels.FirstOrDefault(hotel => hotel.Id == id);
-            if (hotel == null) return NotFound();
-            hotel.Name = updatedHotel.Name;
-            hotel.Address = updatedHotel.Address;
-            return NoContent();
+            if (updatedHotel == null) return BadRequest();
+
+            updatedHotel.Id = id;
+            return _database.Update(updatedHotel) == 0 ? NotFound() : NoContent();
         }
 
         [HttpDelete("{id}", Name = "DeleteHotel")]
         public IActionResult Delete(int id)
         {
-            var hotel = hotels.FirstOrDefault(hotel => hotel.Id == id);
-            if (hotel == null) return NotFound();
-            hotels.Remove(hotel);
-            return NoContent();
+            return _database.Delete<Hotel>(id) == 0 ? NotFound() : NoContent();
         }
     }
 }
