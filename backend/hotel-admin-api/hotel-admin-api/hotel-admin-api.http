@@ -4,3 +4,8 @@ GET {{hotel_admin_api_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+
+GET {{hotel_admin_api_HostAddress}}/hotels/
+Accept: application/json
+
+###

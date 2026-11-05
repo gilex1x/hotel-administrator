@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace hotel_admin_api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("/api/[controller]")]
     [ApiController]
     public class HotelsController : ControllerBase
     {
@@ -15,5 +15,19 @@ namespace hotel_admin_api.Controllers
             new Hotel { Id = 3, Name = "Hotel C", Address = "789 Oak St" },
             new Hotel { Id = 4, Name = "Hotel D", Address = "101 Pine St" },
         };
+
+        [HttpGet(Name = "GetHotels")]
+        public ActionResult<List<Hotel>> Get()
+        {
+            return Ok(hotels);
+        }
+
+        [HttpGet("{id}", Name = "GetHotelById")]
+        public ActionResult<Hotel> GetById(int id)
+        {
+            var hotel = hotels.FirstOrDefault(hotel => hotel.Id == id);
+            if (hotel == null) return NotFound();
+            return Ok(hotel);
+        }
     }
 }

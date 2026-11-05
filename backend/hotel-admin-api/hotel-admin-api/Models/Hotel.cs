@@ -1,6 +1,12 @@
-﻿namespace hotel_admin_api.Controllers.Models
+﻿namespace hotel_admin_api.Models
 {
     public class Hotel
     {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Address { get; set; }
+
+
+
     }
 }
