@@ -8,6 +8,7 @@ namespace hotel_admin_api.Controllers
     [ApiController]
     public class HotelsController : ControllerBase
     {
+        //Change this to a database connection in the future
         static private List<Hotel> hotels = new List<Hotel>
         {
             new Hotel { Id = 1, Name = "Hotel A", Address = "123 Main St" },
@@ -29,7 +30,7 @@ namespace hotel_admin_api.Controllers
             if (hotel == null) return NotFound();
             return Ok(hotel);
         }
-
+        //For this methods, add validation of user authentication and authorization to create, update, or delete.
         [HttpPost(Name = "CreateHotel")]
         public ActionResult<Hotel> Create(Hotel hotel)
         {
@@ -39,13 +40,22 @@ namespace hotel_admin_api.Controllers
         }
 
         [HttpPut("{id}", Name = "UpdateHotel")]
-        public ActionResult<Hotel> Update(int id, Hotel updatedHotel)
+        public IActionResult Update(int id, Hotel updatedHotel)
         {
             var hotel = hotels.FirstOrDefault(hotel => hotel.Id == id);
             if (hotel == null) return NotFound();
             hotel.Name = updatedHotel.Name;
             hotel.Address = updatedHotel.Address;
-            return Ok(hotel);
+            return NoContent();
+        }
+
+        [HttpDelete("{id}", Name = "DeleteHotel")]
+        public IActionResult Delete(int id)
+        {
+            var hotel = hotels.FirstOrDefault(hotel => hotel.Id == id);
+            if (hotel == null) return NotFound();
+            hotels.Remove(hotel);
+            return NoContent();
         }
     }
 }
