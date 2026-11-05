@@ -1,4 +1,5 @@
 ﻿using hotel_admin_api.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SQLite;
 
@@ -28,8 +29,8 @@ namespace hotel_admin_api.Controllers
             if (hotel == null) return NotFound();
             return Ok(hotel);
         }
-        //For this methods, add validation of user authentication and authorization to create, update, or delete.
         [HttpPost(Name = "CreateHotel")]
+        [Authorize(Roles = "Admin")]
         public ActionResult<Hotel> Create(Hotel hotel)
         {
             if (hotel == null) return BadRequest();
@@ -40,6 +41,7 @@ namespace hotel_admin_api.Controllers
         }
 
         [HttpPut("{id}", Name = "UpdateHotel")]
+        [Authorize(Roles = "Admin")]
         public IActionResult Update(int id, Hotel updatedHotel)
         {
             if (updatedHotel == null) return BadRequest();
@@ -49,6 +51,7 @@ namespace hotel_admin_api.Controllers
         }
 
         [HttpDelete("{id}", Name = "DeleteHotel")]
+        [Authorize(Roles = "Admin")]
         public IActionResult Delete(int id)
         {
             return _database.Delete<Hotel>(id) == 0 ? NotFound() : NoContent();
