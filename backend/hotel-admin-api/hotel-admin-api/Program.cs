@@ -29,7 +29,8 @@ if (string.IsNullOrWhiteSpace(adminUsername))
 }
 if (string.IsNullOrWhiteSpace(adminPassword) || adminPassword.Length < 12)
 {
-    throw new InvalidOperationException("Authentication:AdminPassword must be configured and contain at least 12 characters.");
+    throw new InvalidOperationException(
+        "Authentication:AdminPassword must be configured and contain at least 12 characters.");
 }
 
 var signingKey = JwtConfiguration.GetSigningKey(builder.Configuration);
