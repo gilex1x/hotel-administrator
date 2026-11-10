@@ -5,4 +5,5 @@ public sealed record HotelDto(
     string Name,
     string Address,
     IReadOnlyList<int> Reviews,
-    double AverageReviewScore);
+    double AverageReviewScore,
+    string? ImageUrl);

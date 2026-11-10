@@ -36,13 +36,26 @@ public sealed class HotelService : IHotelService
         return hotel is null ? null : ToDto(hotel);
     }
 
+    public byte[]? GetHotelImage(int id)
+    {
+        var imageDataUri = _hotelRepository.GetById(id)?.ImageDataUri;
+        if (imageDataUri is null)
+        {
+            return null;
+        }
+
+        const string prefix = "data:image/jpeg;base64,";
+        return Convert.FromBase64String(imageDataUri[prefix.Length..]);
+    }
+
     public HotelDto CreateHotel(HotelWriteRequest request)
     {
         var hotel = new Hotel
         {
             Name = request.Name.Trim(),
             Address = request.Address.Trim(),
-            Reviews = request.Reviews.ToList()
+            Reviews = request.Reviews.ToList(),
+            ImageDataUri = request.ImageDataUri
         };
 
         return ToDto(_hotelRepository.Add(hotel));
@@ -50,14 +63,23 @@ public sealed class HotelService : IHotelService
 
     public bool UpdateHotel(int id, HotelWriteRequest request)
     {
-        var hotel = new Hotel
+        var hotel = _hotelRepository.GetById(id);
+        if (hotel is null)
         {
-            Id = id,
-            Name = request.Name.Trim(),
-            Address = request.Address.Trim(),
-            Reviews = request.Reviews.ToList()
-        };
+            return false;
+        }
 
+        hotel.Name = request.Name.Trim();
+        hotel.Address = request.Address.Trim();
+        hotel.Reviews = request.Reviews.ToList();
+        if (request.ImageDataUri is not null)
+        {
+            hotel.ImageDataUri = request.ImageDataUri;
+        }
+        else if (request.RemoveImage)
+        {
+            hotel.ImageDataUri = null;
+        }
         return _hotelRepository.Update(hotel);
     }
 
@@ -73,6 +95,7 @@ public sealed class HotelService : IHotelService
             hotel.Name,
             hotel.Address,
             hotel.Reviews.ToArray(),
-            hotel.AverageReviewScore);
+            hotel.AverageReviewScore,
+            hotel.ImageDataUri is null ? null : $"/api/hotels/{hotel.Id}/image");
     }
 }

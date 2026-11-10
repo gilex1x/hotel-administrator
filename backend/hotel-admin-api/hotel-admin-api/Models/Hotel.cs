@@ -11,6 +11,7 @@ namespace hotel_admin_api.Models
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public string Address { get; set; } = string.Empty;
+        public string? ImageDataUri { get; set; }
 
         [Ignore]
         public List<int> Reviews { get; set; } = new List<int>();

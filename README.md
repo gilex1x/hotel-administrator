@@ -6,6 +6,7 @@ Aplicación para explorar y administrar un catálogo de hoteles. Incluye una API
 
 - Listado público de hoteles con filtros por nombre y calificación promedio mínima.
 - Panel de administración con inicio de sesión y operaciones para crear, editar y eliminar hoteles.
+- Una imagen opcional por hotel, procesada como JPEG en el navegador para no superar 400 KB.
 - Autenticación JWT para proteger las operaciones de escritura.
 - Persistencia local en SQLite.
 
@@ -47,7 +48,7 @@ Abre [http://localhost:3000](http://localhost:3000). El frontend usa `http://loc
 3. Abre [http://localhost:3000/admin](http://localhost:3000/admin) e inicia sesión con las credenciales de desarrollo del perfil `http`:
    - Usuario: `admin`
    - Contraseña: `Adminpassword@`
-4. Crea un hotel, edítalo, elimínalo y confirma que el catálogo público refleja los cambios.
+4. Crea un hotel con una imagen, edítalo o quítale la imagen, y elimínalo; confirma que el catálogo público refleja los cambios.
 
 > Estas credenciales y la clave de firma del perfil de desarrollo son exclusivamente para pruebas locales. No las uses en producción. La cuenta se crea cuando la tabla de usuarios está vacía; si la base ya contiene usuarios, el nombre configurado debe coincidir con una cuenta existente.
 
@@ -57,10 +58,13 @@ Abre [http://localhost:3000](http://localhost:3000). El frontend usa `http://loc
 |---|---|---|---|
 | `GET` | `/api/hotels` | Público | Lista hoteles. Acepta `name` y `rating` como filtros opcionales. |
 | `GET` | `/api/hotels/{id}` | Público | Obtiene un hotel por su identificador. |
+| `GET` | `/api/hotels/{id}/image` | Público | Obtiene la imagen JPEG del hotel (si tiene una). |
 | `POST` | `/api/auth/login` | Público | Inicia sesión y devuelve un token JWT. |
 | `POST` | `/api/hotels` | Administrador | Crea un hotel. |
 | `PUT` | `/api/hotels/{id}` | Administrador | Actualiza un hotel. |
 | `DELETE` | `/api/hotels/{id}` | Administrador | Elimina un hotel. |
+
+Las solicitudes `POST` y `PUT` aceptan `imageDataUri` opcional con una imagen JPEG en formato Data URI y un tamaño máximo de 400 KB. Al editar, omitir `imageDataUri` conserva la imagen actual; `removeImage: true` la elimina. El frontend procesa las imágenes seleccionadas a JPEG y reduce calidad/dimensiones solo cuando es necesario para cumplir el límite. Las respuestas de hotel incluyen `imageUrl` cuando hay una imagen.
 
 Ejemplo de filtro:
 

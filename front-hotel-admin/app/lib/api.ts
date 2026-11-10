@@ -4,15 +4,22 @@ export type Hotel = {
   address: string;
   reviews: number[];
   averageReviewScore: number;
+  imageUrl: string | null;
 };
 
 export type HotelInput = {
   name: string;
   address: string;
   reviews: number[];
+  imageDataUri?: string | null;
+  removeImage?: boolean;
 };
 
 const apiBaseUrl = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5002").replace(/\/+$/, "");
+
+export function getHotelImageUrl(id: number) {
+  return `${apiBaseUrl}/api/hotels/${id}/image`;
+}
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${apiBaseUrl}${path}`, {

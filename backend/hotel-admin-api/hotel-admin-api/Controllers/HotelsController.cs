@@ -29,6 +29,13 @@ public class HotelsController : ControllerBase
         return hotel is null ? NotFound() : Ok(hotel);
     }
 
+    [HttpGet("{id}/image", Name = "GetHotelImage")]
+    public IActionResult GetImage(int id)
+    {
+        var image = _hotelService.GetHotelImage(id);
+        return image is null ? NotFound() : File(image, "image/jpeg");
+    }
+
     [HttpPost(Name = "CreateHotel")]
     [Authorize(Roles = "Admin")]
     public ActionResult<HotelDto> Create([FromBody] HotelWriteRequest request)

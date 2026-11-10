@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
-import type { FormEvent } from "react";
+import { useRef, useState } from "react";
+import type { ChangeEvent, FormEvent } from "react";
 import { useAdmin } from "../hooks/useAdmin";
+import { getHotelImageUrl } from "../lib/api";
 import type { Hotel, HotelInput } from "../lib/api";
+import { compressHotelImage } from "../lib/image";
 
 type HotelForm = {
     name: string;
@@ -46,6 +48,13 @@ export default function AdminPage() {
     const [editingId, setEditingId] = useState<number | null>(null);
     const [formError, setFormError] = useState("");
     const [message, setMessage] = useState("");
+    const [imageDataUri, setImageDataUri] = useState<string | null>(null);
+    const [removeExistingImage, setRemoveExistingImage] = useState(false);
+    const [processingImage, setProcessingImage] = useState(false);
+    const imageInputRef = useRef<HTMLInputElement>(null);
+    const editingHotel = hotels.find((hotel) => hotel.id === editingId);
+    const previewImageUrl = imageDataUri
+        ?? (editingHotel?.imageUrl && !removeExistingImage ? getHotelImageUrl(editingHotel.id) : null);
 
     async function handleLogin(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
@@ -62,6 +71,9 @@ export default function AdminPage() {
             address: hotel.address,
             reviews: hotel.reviews.join(", "),
         });
+        setImageDataUri(null);
+        setRemoveExistingImage(false);
+        if (imageInputRef.current) imageInputRef.current.value = "";
         setMessage("");
         setFormError("");
         clearError();
@@ -71,6 +83,33 @@ export default function AdminPage() {
     function resetForm() {
         setEditingId(null);
         setForm(emptyForm);
+        setImageDataUri(null);
+        setRemoveExistingImage(false);
+        if (imageInputRef.current) imageInputRef.current.value = "";
+    }
+
+    async function handleImageSelection(event: ChangeEvent<HTMLInputElement>) {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        setFormError("");
+        setProcessingImage(true);
+        try {
+            setImageDataUri(await compressHotelImage(file));
+            setRemoveExistingImage(false);
+        } catch (imageError: unknown) {
+            setImageDataUri(null);
+            if (imageInputRef.current) imageInputRef.current.value = "";
+            setFormError(imageError instanceof Error ? imageError.message : "No se pudo procesar la imagen.");
+        } finally {
+            setProcessingImage(false);
+        }
+    }
+
+    function handleRemoveImage() {
+        setImageDataUri(null);
+        setRemoveExistingImage(editingId !== null && Boolean(hotels.find((hotel) => hotel.id === editingId)?.imageUrl));
+        if (imageInputRef.current) imageInputRef.current.value = "";
     }
 
     async function handleSave(event: FormEvent<HTMLFormElement>) {
@@ -88,7 +127,13 @@ export default function AdminPage() {
             return;
         }
 
-        const saved = await saveHotel(editingId, toHotelInput(form));
+        if (processingImage) return;
+
+        const saved = await saveHotel(editingId, {
+            ...toHotelInput(form),
+            imageDataUri,
+            removeImage: removeExistingImage,
+        });
         if (saved) {
             if (editingId === null) {
                 setMessage("Hotel creado correctamente.");
@@ -206,9 +251,32 @@ export default function AdminPage() {
                                     placeholder="Ej. 5, 4, 5"
                                 />
                             </label>
+                            <label className="form-field">
+                                <span>Imagen <span className="field-hint">(opcional, máximo 400 KB)</span></span>
+                                <input
+                                    ref={imageInputRef}
+                                    accept="image/*"
+                                    onChange={(event) => void handleImageSelection(event)}
+                                    disabled={saving || processingImage}
+                                    type="file"
+                                />
+                            </label>
+                            {processingImage && <p className="field-hint">Procesando imagen…</p>}
+                            {previewImageUrl && (
+                                <div className="image-preview-wrap">
+                                    <img
+                                        className="image-preview"
+                                        src={previewImageUrl}
+                                        alt="Vista previa de la imagen del hotel"
+                                    />
+                                    <button className="text-button text-danger" disabled={saving || processingImage} onClick={handleRemoveImage} type="button">
+                                        Quitar imagen
+                                    </button>
+                                </div>
+                            )}
                             <div className="form-actions">
-                                <button className="button button-primary" disabled={saving} type="submit">
-                                    {saving ? "Guardando…" : editingId === null ? "Crear hotel" : "Guardar cambios"}
+                                <button className="button button-primary" disabled={saving || processingImage} type="submit">
+                                    {processingImage ? "Procesando imagen…" : saving ? "Guardando…" : editingId === null ? "Crear hotel" : "Guardar cambios"}
                                 </button>
                                 {editingId !== null && (
                                     <button className="button button-quiet" onClick={resetForm} type="button">Cancelar</button>

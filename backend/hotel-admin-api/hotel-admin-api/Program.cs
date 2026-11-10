@@ -77,6 +77,10 @@ var app = builder.Build();
 var database = app.Services.GetRequiredService<SQLiteConnection>();
 database.CreateTable<Hotel>();
 database.CreateTable<User>();
+if (!database.GetTableInfo("Hotels").Any(column => column.Name == nameof(Hotel.ImageDataUri)))
+{
+    database.Execute("ALTER TABLE Hotels ADD COLUMN ImageDataUri TEXT NULL");
+}
 
 if (!database.Table<Hotel>().Any())
 {
